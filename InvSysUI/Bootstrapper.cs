@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using InvSysUI.Helpers;
+using InvSysUI.Library.Api;
 using InvSysUI.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using InvSysUI.Library.Models;
 using System.Windows.Controls;
 
 namespace InvSysUI
@@ -29,6 +31,7 @@ namespace InvSysUI
             _container
                 .Singleton<IWindowManager, WindowManager>()
                 .Singleton<IEventAggregator, EventAggregator>()
+                .Singleton<ILoggedInUserModel, LoggedInUserModel>()
                 .Singleton<IAPIHelper, APIHelper>();
 
             GetType().Assembly.GetTypes()

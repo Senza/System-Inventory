@@ -12,12 +12,13 @@ namespace InventorySystemDataManager.Controllers
     [Authorize]
     public class UserController : ApiController
     {
-        public List<UserModel> GetbyId()
+        [HttpGet]
+        public UserModel GetbyId()
         {
             string userId = RequestContext.Principal.Identity.GetUserId();
             UserData data = new UserData();
 
-            return data.GetUserById(userId);
+            return data.GetUserById(userId).First();
         }
 
     }
