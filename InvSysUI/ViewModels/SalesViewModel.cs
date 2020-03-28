@@ -8,14 +8,15 @@ using System.Threading.Tasks;
 
 namespace InvSysUI.ViewModels
 {
-    public class SalesViewMdel : Screen
+    public class SalesViewModel : Screen
     {
 		private BindingList<string> _products;
 
 		public BindingList<string> Products
 		{
 			get { return _products; }
-			set {
+			set 
+            {
 				_products = value;
 				NotifyOfPropertyChange(() => Products);
 			}
@@ -25,14 +26,18 @@ namespace InvSysUI.ViewModels
         public BindingList<string> Cart
         {
             get { return _cart; }
-            set { _cart = value; }
+            set 
+            { 
+                _cart = value;
+                NotifyOfPropertyChange(() => Cart);
+            }
         }
 
 
 
-        private string _itemQuantity;
+        private int _itemQuantity;
 
-		public string ItemQuantity
+		public int ItemQuantity
 		{
 			get { return _itemQuantity; }
 			set {
