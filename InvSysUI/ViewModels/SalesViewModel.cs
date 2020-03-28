@@ -1,4 +1,6 @@
 ﻿using Caliburn.Micro;
+using InvSysUI.Library.Api;
+using InvSysUI.Library.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,9 +12,30 @@ namespace InvSysUI.ViewModels
 {
     public class SalesViewModel : Screen
     {
-		private BindingList<string> _products;
+        IProductEndpoint _productEndPoint;
 
-		public BindingList<string> Products
+        public SalesViewModel(IProductEndpoint productEndPoint)
+        {
+            _productEndPoint = productEndPoint;
+           
+        }
+
+        protected override async void OnViewLoaded(object view)
+        {
+            base.OnViewLoaded(view);
+            await LoadPrducts();
+
+        }
+
+        private async Task LoadPrducts() 
+        {
+            var productList = await _productEndPoint.GetAll();
+            Products = new BindingList<ProductModel>(productList);
+        }
+
+		private BindingList<ProductModel> _products;
+
+		public BindingList<ProductModel> Products
 		{
 			get { return _products; }
 			set 
@@ -21,9 +44,9 @@ namespace InvSysUI.ViewModels
 				NotifyOfPropertyChange(() => Products);
 			}
 		}
-        private BindingList<string> _cart;
+        private BindingList<ProductModel> _cart;
 
-        public BindingList<string> Cart
+        public BindingList<ProductModel> Cart
         {
             get { return _cart; }
             set 
