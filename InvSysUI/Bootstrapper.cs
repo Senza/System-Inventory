@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using InvSysUI.Library.Models;
 using System.Windows.Controls;
+using InvSysUI.Library.Helpers;
 
 namespace InvSysUI
 {
@@ -34,6 +35,7 @@ namespace InvSysUI
                 .Singleton<IWindowManager, WindowManager>()
                 .Singleton<IEventAggregator, EventAggregator>()
                 .Singleton<ILoggedInUserModel, LoggedInUserModel>()
+                .Singleton<IConfigHelper,ConfigHelper>()
                 .Singleton<IAPIHelper, APIHelper>();
 
             GetType().Assembly.GetTypes()

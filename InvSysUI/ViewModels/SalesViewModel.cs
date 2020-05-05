@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using InvSysUI.Library.Api;
+using InvSysUI.Library.Helpers;
 using InvSysUI.Library.Models;
 using System;
 using System.Collections.Generic;
@@ -14,10 +15,12 @@ namespace InvSysUI.ViewModels
     public class SalesViewModel : Screen
     {
         IProductEndpoint _productEndPoint;
+        IConfigHelper _configHelper;
 
-        public SalesViewModel(IProductEndpoint productEndPoint)
+        public SalesViewModel(IProductEndpoint productEndPoint, IConfigHelper configHelper)
         {
             _productEndPoint = productEndPoint;
+            _configHelper = configHelper;
            
         }
 
@@ -89,30 +92,49 @@ namespace InvSysUI.ViewModels
         {
             get 
             {
-                decimal subTotal = 0;
-                foreach (var item in Cart)
-                {
-                    subTotal += (item.Product.RetailPrice * item.QuantityInCart);
-                }
-                return subTotal.ToString("C", CultureInfo.CreateSpecificCulture("ng-NG")); 
+                return CalculateSubTotal().ToString("C", CultureInfo.CreateSpecificCulture("ng-NG")); 
             }
           
+        }
+
+        private decimal CalculateSubTotal() 
+        {
+            decimal subTotal = 0;
+            foreach (var item in Cart)
+            {
+                subTotal += (item.Product.RetailPrice * item.QuantityInCart);
+            }
+            return subTotal;
+        }
+
+        private decimal CalculateTax() 
+        {
+            decimal taxAmount = 0;
+            decimal taxRate = _configHelper.GetTaxRate()/100;
+            foreach (var item in Cart)
+            {
+                if (item.Product.IsTaxable == true)
+                {
+                    taxAmount += (item.Product.RetailPrice * item.QuantityInCart * taxRate);
+                }
+            }
+            return taxAmount;
         }
         public string Tax
         {
             get
             {
-                //Todo replace with calculation
-                return "₦0.00";
+                return CalculateTax().ToString("C", CultureInfo.CreateSpecificCulture("ng-NG"));
             }
 
         }
+       
         public string Total
         {
             get
             {
-                //Todo replace with calculation
-                return "₦0.00";
+                decimal total = CalculateSubTotal() + CalculateTax();
+                return total.ToString("C", CultureInfo.CreateSpecificCulture("ng-NG"));
             }
 
         }
@@ -162,7 +184,9 @@ namespace InvSysUI.ViewModels
             SelectedProduct.QuantityInStock -= ItemQuantity;
             ItemQuantity = 1;
             NotifyOfPropertyChange(() => SubTotal);
-            NotifyOfPropertyChange(() => Cart);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
+            //NotifyOfPropertyChange(() => Cart);
         }
 
         public bool CanRemoveFromCart
@@ -180,6 +204,8 @@ namespace InvSysUI.ViewModels
         public async Task RemoveFromCart()
         {
             NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
         }
 
         public bool CanCheckOut
