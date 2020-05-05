@@ -4,6 +4,7 @@ using InvSysUI.Library.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,9 +45,22 @@ namespace InvSysUI.ViewModels
 				NotifyOfPropertyChange(() => Products);
 			}
 		}
-        private BindingList<ProductModel> _cart;
 
-        public BindingList<ProductModel> Cart
+        private ProductModel _selectedProducts;
+
+        public ProductModel SelectedProduct
+        {
+            get { return _selectedProducts; }
+            set 
+            { 
+                _selectedProducts = value;
+                NotifyOfPropertyChange(() => SelectedProduct);
+            }
+        }
+
+        private BindingList<CartItemModel> _cart = new BindingList<CartItemModel>();
+
+        public BindingList<CartItemModel> Cart
         {
             get { return _cart; }
             set 
@@ -58,7 +72,7 @@ namespace InvSysUI.ViewModels
 
 
 
-        private int _itemQuantity;
+        private int _itemQuantity = 1;
 
 		public int ItemQuantity
 		{
@@ -66,6 +80,7 @@ namespace InvSysUI.ViewModels
 			set {
 				_itemQuantity = value;
 				NotifyOfPropertyChange(() => ItemQuantity);
+                NotifyOfPropertyChange(() => CanAddToCart);
 			}
 		}
 
@@ -73,9 +88,13 @@ namespace InvSysUI.ViewModels
         public string SubTotal
         {
             get 
-            { 
-                //Todo replace with calculation
-                return "₦0.00"; 
+            {
+                decimal subTotal = 0;
+                foreach (var item in Cart)
+                {
+                    subTotal += (item.Product.RetailPrice * item.QuantityInCart);
+                }
+                return subTotal.ToString("C", CultureInfo.CreateSpecificCulture("ng-NG")); 
             }
           
         }
@@ -98,6 +117,8 @@ namespace InvSysUI.ViewModels
 
         }
 
+   
+
         public bool CanAddToCart
         {
             get
@@ -105,6 +126,10 @@ namespace InvSysUI.ViewModels
                 bool output = false;
                 //make sure something is selected
                 //Make sure there is an item quantity
+                if(ItemQuantity > 0 && SelectedProduct?.QuantityInStock >= ItemQuantity) 
+                {
+                    output = true;
+                }
        
                 return output;
             }
@@ -113,7 +138,31 @@ namespace InvSysUI.ViewModels
 
         public async Task AddToCart()
         {
+            CartItemModel existingItem = Cart.FirstOrDefault(x => x.Product == SelectedProduct);
+
+            if(existingItem != null) 
+            {
+                existingItem.QuantityInCart += ItemQuantity;
+                //Hack  - There should be a better way of refreshing the cart display
+                Cart.Remove(existingItem);
+                Cart.Add(existingItem);
+               
+            }
+            else
+            {
+                CartItemModel item = new CartItemModel
+                {
+                    Product = SelectedProduct,
+                    QuantityInCart = ItemQuantity
+                };
+
+                Cart.Add(item);
+            }
            
+            SelectedProduct.QuantityInStock -= ItemQuantity;
+            ItemQuantity = 1;
+            NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Cart);
         }
 
         public bool CanRemoveFromCart
@@ -130,7 +179,7 @@ namespace InvSysUI.ViewModels
 
         public async Task RemoveFromCart()
         {
-
+            NotifyOfPropertyChange(() => SubTotal);
         }
 
         public bool CanCheckOut
