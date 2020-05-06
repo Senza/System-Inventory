@@ -15,11 +15,13 @@ namespace InvSysUI.ViewModels
     public class SalesViewModel : Screen
     {
         IProductEndpoint _productEndPoint;
+        ISaleEndpoint _saleEndpoint;
         IConfigHelper _configHelper;
 
-        public SalesViewModel(IProductEndpoint productEndPoint, IConfigHelper configHelper)
+        public SalesViewModel(IProductEndpoint productEndPoint, IConfigHelper configHelper, ISaleEndpoint saleEndpoint)
         {
             _productEndPoint = productEndPoint;
+            _saleEndpoint = saleEndpoint;
             _configHelper = configHelper;
            
         }
@@ -193,7 +195,7 @@ namespace InvSysUI.ViewModels
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
-            //NotifyOfPropertyChange(() => Cart);
+            NotifyOfPropertyChange(() => CanCheckOut);
         }
 
         public bool CanRemoveFromCart
@@ -213,6 +215,7 @@ namespace InvSysUI.ViewModels
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanCheckOut);
         }
 
         public bool CanCheckOut
@@ -221,7 +224,10 @@ namespace InvSysUI.ViewModels
             {
                 bool output = false;
                 //make sure something is in the cart
-
+                if(Cart.Count > 0) 
+                {
+                    output = true;
+                }
                 return output;
             }
 
@@ -229,8 +235,18 @@ namespace InvSysUI.ViewModels
 
         public async Task CheckOut()
         {
+            SaleModel sale = new SaleModel();
+            foreach (var item in Cart)
+            {
+                sale.SaleDetails.Add(new SaleDetail
+                {
+                    ProductId = item.Product.Id,
+                    Quantity = item.QuantityInCart
+                });
+            }
 
+            await _saleEndpoint.PostSale(sale);
         }
-
+        
     }
 }
