@@ -28,7 +28,7 @@ namespace InvSysUI
             "PasswordChanged");
         }
 
-        private IMapper ConfigureAutoMapper() 
+        private IMapper ConfigureAutomapper() 
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -36,16 +36,16 @@ namespace InvSysUI
                 cfg.CreateMap<CartItemModel, CartItemDisplayModel>();
             });
 
-            var mapper = config.CreateMapper();
+            var output = config.CreateMapper();
 
-            return mapper;
+            return output;
         }
 
         protected override void Configure()
         {
             
 
-            _container.Instance(ConfigureAutoMapper());
+            _container.Instance(ConfigureAutomapper());
 
             _container.Instance(_container)
                 .PerRequest<IProductEndpoint, ProductEndpoint>()
