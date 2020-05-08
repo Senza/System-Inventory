@@ -11,6 +11,8 @@ using System.Windows;
 using InvSysUI.Library.Models;
 using System.Windows.Controls;
 using InvSysUI.Library.Helpers;
+using AutoMapper;
+using InvSysUI.Models;
 
 namespace InvSysUI
 {
@@ -26,8 +28,25 @@ namespace InvSysUI
             "PasswordChanged");
         }
 
+        private IMapper ConfigureAutoMapper() 
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<ProductModel, ProductDisplayModel>();
+                cfg.CreateMap<CartItemModel, CartItemDisplayModel>();
+            });
+
+            var mapper = config.CreateMapper();
+
+            return mapper;
+        }
+
         protected override void Configure()
         {
+            
+
+            _container.Instance(ConfigureAutoMapper());
+
             _container.Instance(_container)
                 .PerRequest<IProductEndpoint, ProductEndpoint>()
                 .PerRequest<ISaleEndpoint, SaleEndpoint>();

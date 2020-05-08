@@ -12,8 +12,8 @@ namespace InvSysUI.ViewModels
 {
     public class LoginViewModel : Screen
     {
-        private string _userName;
-        private string _password;
+        private string _userName = "senzaspiiii@gmail.com";
+        private string _password = "Pwd1234.";
         private IAPIHelper _apiHelper;
         private IEventAggregator _events;
 
