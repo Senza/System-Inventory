@@ -16,7 +16,7 @@ namespace InvSysUI.Library.Models
         public string IDNumber { get; set; }
         public DateTime CreatedDate { get; set; }
 
-        public void LogOffUser()
+        public void ResetUserModel()
         {
             Token = "";
             Id = "";
