@@ -11,5 +11,7 @@ namespace InvSysUI.Library.Models
         string IDNumber { get; set; }
         string LastName { get; set; }
         string Token { get; set; }
+
+        void LogOffUser();
     }
 }

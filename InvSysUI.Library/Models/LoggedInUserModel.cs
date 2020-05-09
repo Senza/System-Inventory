@@ -15,5 +15,16 @@ namespace InvSysUI.Library.Models
         public string EmailAddress { get; set; }
         public string IDNumber { get; set; }
         public DateTime CreatedDate { get; set; }
+
+        public void LogOffUser()
+        {
+            Token = "";
+            Id = "";
+            FirstName = "";
+            LastName = "";
+            EmailAddress = "";
+            IDNumber = "";
+            CreatedDate = DateTime.MinValue;
+    }
     }
 }
