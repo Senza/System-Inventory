@@ -54,20 +54,36 @@ namespace InventorySystemDataManager.Library.DataAccess
 
             sale.Total = sale.SubTotal + sale.Tax;
 
-            SqlDataAccess sql = new SqlDataAccess();
-
-            sql.SaveData("dbo.spSale_Insert", sale, "InvSysData");
-
-            sale.Id = sql.LoadData<int, dynamic>("spSale_Lookup", 
-                new {sale.CashierId, sale.SaleDate }, "InvSysData").FirstOrDefault();
-
-            foreach (var item in details)
+            using (SqlDataAccess sql = new SqlDataAccess()) 
             {
-                item.SaleId = sale.Id;
-                sql.SaveData("dbo.spSaleDetail_Insert", item, "InvSysData");
+                try
+                {
+                    sql.StartTranscation("InvSysData");
+                    sql.SaveDataInTransaction("dbo.spSale_Insert", sale);
+
+                    sale.Id = sql.LoadDataInTransaction<int, dynamic>("spSale_Lookup",
+                    new { sale.CashierId, sale.SaleDate }).FirstOrDefault();
+
+                    foreach (var item in details)
+                    {
+                        item.SaleId = sale.Id;
+                        sql.SaveDataInTransaction("dbo.spSaleDetail_Insert", item);
+                    }
+
+                    sql.CommitTransaction();
+                }
+                catch
+                {
+
+                    sql.RollbackTransaction();
+                    throw;
+                }
+
             }
 
-          
+
+
+
             //public List<ProductModel> GetPrducts()
             //{
             //    SqlDataAccess sql = new SqlDataAccess();
