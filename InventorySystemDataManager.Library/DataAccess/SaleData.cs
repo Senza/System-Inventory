@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -81,19 +82,15 @@ namespace InventorySystemDataManager.Library.DataAccess
 
             }
 
+        }
 
+        public List<SaleReportModel> GetSaleReport()
+        {
+            SqlDataAccess sql = new SqlDataAccess();
 
+            var output = sql.LoadData<SaleReportModel, dynamic>("dbo.spSale_SaleReport", new { }, "InvSysData");
 
-            //public List<ProductModel> GetPrducts()
-            //{
-            //    SqlDataAccess sql = new SqlDataAccess();
-
-
-            //    var output = sql.LoadData<ProductModel, dynamic>("dbo.spProduct_GetAll", new { }, "InvSysData");
-
-            //    return output;
-            //}
-
+            return output;
         }
     }
 }

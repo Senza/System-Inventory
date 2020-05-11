@@ -10,7 +10,7 @@ using System.Web.Http;
 
 namespace InventorySystemDataManager.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class SaleController : ApiController
     {
         public void Post(SaleModel sale)
@@ -19,6 +19,12 @@ namespace InventorySystemDataManager.Controllers
             string userId = RequestContext.Principal.Identity.GetUserId();
             data.SaveSale(sale, userId);
         }
-    
+
+        [Route("GetSaleReport")]
+        public List<SaleReportModel> GetSaleReport()
+        {
+            SaleData data = new SaleData();
+            return data.GetSaleReport();
+        }
     }
 }
